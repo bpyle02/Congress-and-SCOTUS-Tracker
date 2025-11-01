@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ResolutionCard from '../../components/ResolutionCard.astro';
+
+const res = await fetch('https://www.govtrack.us/api/v2/resolution/?congress=119&limit=50');
+const { objects: resolutions } = await res.json();
+---
+
+<Layout
+  title="U.S. House Resolutions - 119th Congress"
+  description="Track the latest resolutions introduced in the U.S. House of Representatives."
+>
+  <h1>House Resolutions</h1>
+  <ul>
+    {resolutions.map((b: any) => (
+      <ResolutionCard resolution={b} />
+    ))}
+  </ul>
+</Layout>

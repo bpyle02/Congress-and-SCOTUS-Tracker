@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import BillCard from '../../components/BillCard.astro';
+
+const res = await fetch('https://www.govtrack.us/api/v2/bill/?congress=119&limit=50');
+const { objects: bills } = await res.json();
+---
+
+<Layout
+  title="U.S. House Bills - 119th Congress"
+  description="Track the latest bills introduced in the U.S. House of Representatives."
+>
+  <h1>House Bills</h1>
+  <ul>
+    {bills.map((b: any) => (
+      <BillCard bill={b} />
+    ))}
+  </ul>
+</Layout>

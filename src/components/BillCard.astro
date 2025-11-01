@@ -1,0 +1,48 @@
+---
+interface Bill {
+  display_number: string
+  title:        string
+  summary?:     string
+  link:         string
+  sponsor?:     { name?: string }
+}
+
+export interface Props { bill: Bill }
+
+const { bill } = Astro.props;
+const link = `/bills/${bill.display_number.replace(/\s+/g, '-').toLowerCase()}`;
+---
+
+<li class="card">
+  <a href={link}>
+    <h2>{bill.display_number}</h2>
+    <p>{bill.title}</p>
+    <span>→</span>
+  </a>
+</li>
+
+<style>
+  .card {
+    list-style: none;
+    border: 1px solid #e5e5e5;
+    border-radius: 4px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+  .card a {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .card h2 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  .card p {
+    margin: 0.25rem 0 0;
+    flex: 1;
+    padding: 0 1rem;
+  }
+</style>

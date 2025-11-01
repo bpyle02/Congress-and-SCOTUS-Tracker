@@ -1,0 +1,79 @@
+---
+// src/pages/bills/[billId].astro
+export async function getStaticPaths() {
+  const res = await fetch('https://www.govtrack.us/api/v2/bill/?congress=119&limit=100');
+  const data = await res.json();
+
+  return (data.objects as Bill[]).map((b) => ({
+    params: { billId: b.display_number.replace(/\s+/g, '-').toLowerCase() },
+    props: { bill: b },
+  }));
+}
+
+interface Bill {
+  display_number: string;
+  title_without_number: string;
+  summary?: string;
+  current_status?: string;
+  link: string;
+  sponsor?: { name?: string };
+}
+
+const { bill } = Astro.props as { bill: Bill };
+const display_number = bill.display_number
+const title = bill.title_without_number;
+const status = bill.current_status;
+const description = bill.summary ?? 'No summary available.';
+---
+<div class="card-container">
+    <div class="card">
+        <h1>{display_number} | {status}</h1>
+        <h1>{title}</h1>
+        <h3>{status}</h3>
+        <p>{description}</p>
+        <p>Sponsor: <strong>{bill.sponsor?.name ?? 'Unknown'}</strong></p>
+        <a href={bill.link} target="_blank" rel="noreferrer">View on GovTrack</a>
+    </div>
+</div>
+
+<style>
+    .card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem; /* Space between cards */
+    padding: 1rem;
+    }
+    .card {
+    background-color: #e9e9e9;
+    padding: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    flex-basis: 100%; /* Default: 1 column for smallest screens */
+    box-sizing: border-box;
+    text-align: center;
+    }
+    .card h3 {
+    font-size: 20px;
+    font-weight: 500;
+    }
+    /* Small devices (tablets, 600px and up) */
+    @media (min-width: 600px) {
+    .card {
+        flex-basis: calc(50% - 0.5rem); /* 2 columns, accounting for gap */
+    }
+    }
+
+    /* Medium devices (desktops, 900px and up) */
+    @media (min-width: 900px) {
+    .card {
+        flex-basis: calc(33.333% - 0.67rem); /* 3 columns */
+    }
+    }
+
+    /* Large devices (large desktops, 1200px and up) */
+    @media (min-width: 1200px) {
+    .card {
+        flex-basis: calc(25% - 0.75rem); /* 4 columns */
+    }
+    }
+</style>

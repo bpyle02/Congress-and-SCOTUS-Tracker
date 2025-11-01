@@ -1,0 +1,29 @@
+---
+// src/pages/resolutions/[resolutionId].astro
+export async function getStaticPaths() {
+  const res = await fetch('https://www.govtrack.us/api/v2/resolution/?congress=119&limit=100');
+  const data = await res.json();
+
+  return (data.objects as Resolution[]).map((b) => ({
+    params: { resolutionId: b.display_number.replace(/\s+/g, '-').toLowerCase() },
+    props: { resolution: b },
+  }));
+}
+
+interface Resolution {
+  display_number: string;
+  title:        string;
+  summary?:     string;
+  link:         string;
+  sponsor?:     { name?: string };
+}
+
+const { resolution } = Astro.props as { resolution: Resolution };
+const title = `${resolution.title}`;
+const description = resolution.summary ?? 'No summary available.';
+---
+
+<h1>{title}</h1>
+<p>{description}</p>
+<p>Sponsor: <strong>{resolution.sponsor?.name ?? 'Unknown'}</strong></p>
+<a href={resolution.link} target="_blank" rel="noreferrer">View on GovTrack</a>
